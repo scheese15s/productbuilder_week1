@@ -12,15 +12,14 @@ class NumberBlock extends HTMLElement {
         wrapper.style.display = 'flex';
         wrapper.style.flexDirection = 'column-reverse';
 
-        // --- UPDATED: Correct 7-color rainbow sequence ---
-        const rainbowColors = [ 
-            '#ff6f61', // 1. 빨간색
-            '#ffa726', // 2. 주황색
-            '#ffca28', // 3. 노란색
-            '#66bb6a', // 4. 초록색
-            '#42a5f5', // 5. 하늘색
-            '#3f51b5', // 6. 남색 (Indigo)
-            '#ab47bc'  // 7. 보라색
+        const rainbowColors = [
+            '#ff6f61',
+            '#ffa726',
+            '#ffca28',
+            '#66bb6a',
+            '#42a5f5',
+            '#3f51b5',
+            '#ab47bc'
         ];
 
         for (let i = 0; i < value; i++) {
@@ -46,53 +45,78 @@ class NumberBlock extends HTMLElement {
                 block.style.backgroundColor = colorScheme;
                 block.style.color = 'white';
             }
-            
-            if (i === value - 1) { // Show number on the top block
+
+            if (i === value - 1) {
                 block.textContent = value;
             }
             wrapper.appendChild(block);
         }
 
-        this.shadowRoot.innerHTML = ''; 
+        this.shadowRoot.innerHTML = '';
         this.shadowRoot.appendChild(wrapper);
     }
 }
 
 customElements.define('number-block', NumberBlock);
 
-// DOM Elements
 const num1Container = document.getElementById('num1-container');
 const num2Container = document.getElementById('num2-container');
-const answerInput = document.getElementById('answer');
-const checkAnswerBtn = document.getElementById('check-answer');
-const newProblemBtn = document.getElementById('new-problem');
+const choicesArea = document.getElementById('choices-area');
 const feedbackEl = document.getElementById('feedback');
 const hogiPopup = document.getElementById('hogi-popup');
 
-// State
 let correctAnswer;
 
-// --- NEW: Number-to-Color Mapping ---
 const colorMap = {
-    1: '#ff6f61',      // 1: 빨간색
-    2: '#ffa726',      // 2: 주황색
-    3: '#ffca28',      // 3: 노란색
-    4: '#66bb6a',      // 4: 초록색
-    5: '#42a5f5',      // 5: 하늘색
-    6: '#ab47bc',      // 6: 보라색
-    7: 'rainbow',        // 7: 무지개
-    8: '#ec407a',      // 8: 자주색
-    9: '#9e9e9e',      // 9: 회색
-    10: 'white-red-border' // 10: 흰색 (빨간 테두리)
+    1: '#ff6f61',
+    2: '#ffa726',
+    3: '#ffca28',
+    4: '#66bb6a',
+    5: '#42a5f5',
+    6: '#ab47bc',
+    7: 'rainbow',
+    8: '#ec407a',
+    9: '#9e9e9e',
+    10: 'white-red-border'
 };
 
 function getColorForNumber(number) {
-    return colorMap[number] || '#333'; // Return the color for the number, or a default
+    return colorMap[number] || '#333';
 }
 
 function closeHogiPopup() {
     hogiPopup.classList.add('hidden');
+    hogiPopup.classList.remove('show-animation');
     document.body.classList.remove('popup-open');
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function buildChoices(answer) {
+    const choices = new Set([answer]);
+
+    while (choices.size < 4) {
+        const offset = Math.floor(Math.random() * 9) - 4;
+        const candidate = answer + offset;
+        if (candidate >= 2 && candidate <= 20) {
+            choices.add(candidate);
+        }
+    }
+
+    return shuffle(Array.from(choices));
+}
+
+function renderChoices() {
+    const options = buildChoices(correctAnswer);
+    choicesArea.innerHTML = options
+        .map((value) => `<button class="choice-btn" data-value="${value}" type="button">${value}</button>`)
+        .join('');
 }
 
 function generateProblem() {
@@ -100,25 +124,28 @@ function generateProblem() {
     const num2 = Math.floor(Math.random() * 10) + 1;
     correctAnswer = num1 + num2;
 
-    // --- UPDATED: Use the new color mapping logic ---
     const color1 = getColorForNumber(num1);
     const color2 = getColorForNumber(num2);
 
     num1Container.innerHTML = `<number-block value="${num1}" color="${color1}"></number-block>`;
     num2Container.innerHTML = `<number-block value="${num2}" color="${color2}"></number-block>`;
 
-    answerInput.value = '';
     feedbackEl.textContent = '';
+    feedbackEl.className = '';
     closeHogiPopup();
-    answerInput.focus();
+    renderChoices();
 }
 
 function fireConfetti() {
     const count = 200;
     const defaults = { origin: { y: 0.7 } };
+
     function fire(particleRatio, opts) {
-        confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) }));
+        confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+        }));
     }
+
     fire(0.25, { spread: 26, startVelocity: 55 });
     fire(0.2, { spread: 60 });
     fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
@@ -126,43 +153,49 @@ function fireConfetti() {
     fire(0.1, { spread: 120, startVelocity: 45 });
 }
 
-function checkAnswer() {
-    const userAnswer = parseInt(answerInput.value, 10);
-    if (isNaN(userAnswer)) {
-        feedbackEl.textContent = "숫자를 입력해주세요!";
-        feedbackEl.className = 'incorrect';
-        return;
-    }
-    if (userAnswer === correctAnswer) {
-        feedbackEl.textContent = "정답! 참 잘했어요!";
+function disableChoices() {
+    const buttons = choicesArea.querySelectorAll('.choice-btn');
+    buttons.forEach((button) => {
+        button.disabled = true;
+    });
+}
+
+function checkAnswer(selectedValue, buttonEl) {
+    if (selectedValue === correctAnswer) {
+        feedbackEl.textContent = '정답! 참 잘했어요!';
         feedbackEl.className = 'correct';
+        buttonEl.classList.add('correct-choice');
+        disableChoices();
         fireConfetti();
         hogiPopup.classList.remove('hidden');
-        hogiPopup.classList.add('show-animation'); // Trigger animation
+        hogiPopup.classList.add('show-animation');
         document.body.classList.add('popup-open');
+
         setTimeout(() => {
             closeHogiPopup();
-            generateProblem(); // Automatically generate new problem after animation
-        }, 2000); // Match animation duration
-    } else {
-        feedbackEl.textContent = `아쉽지만 다시 시도해보세요! 정답은 ${correctAnswer}이에요.`;
-        feedbackEl.className = 'incorrect';
+            generateProblem();
+        }, 2000);
+        return;
     }
+
+    feedbackEl.textContent = '아쉽지만 다시 시도해보세요!';
+    feedbackEl.className = 'incorrect';
+    buttonEl.classList.add('wrong-choice');
+    buttonEl.disabled = true;
 }
 
-// Event Listeners
-checkAnswerBtn.addEventListener('click', checkAnswer);
-// newProblemBtn.addEventListener('click', generateProblem); // Removed as problems generate automatically
-answerInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') checkAnswer();
+choicesArea.addEventListener('click', (event) => {
+    const button = event.target.closest('.choice-btn');
+    if (!button) {
+        return;
+    }
+
+    const selectedValue = parseInt(button.dataset.value || '', 10);
+    if (Number.isNaN(selectedValue)) {
+        return;
+    }
+
+    checkAnswer(selectedValue, button);
 });
 
-// Initial problem
 generateProblem();
-
-// Modified closeHogiPopup to also remove the animation class
-function closeHogiPopup() {
-    hogiPopup.classList.add('hidden');
-    hogiPopup.classList.remove('show-animation'); // Clean up animation class
-    document.body.classList.remove('popup-open');
-}

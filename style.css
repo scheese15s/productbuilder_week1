@@ -71,11 +71,10 @@
         border: 2px dashed #90b9ff;
     }
 
-    #input-area {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.65rem;
+    #choices-area {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.7rem;
         margin-bottom: 0.75rem;
     }
 }
@@ -107,31 +106,6 @@
         min-width: 1.75ch;
     }
 
-    #answer {
-        width: 120px;
-        padding: 0.62rem 0.75rem;
-        text-align: center;
-        border-radius: 12px;
-        border: 2px solid #a5b8da;
-        font-family: var(--body-font);
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: var(--text);
-        background: #ffffff;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    }
-
-    #answer::placeholder {
-        color: #8f9ab2;
-    }
-
-    #answer:focus {
-        outline: none;
-        border-color: #4d9bff;
-        box-shadow: 0 0 0 4px #4d9bff2e;
-        transform: translateY(-1px);
-    }
-
     button {
         border: none;
         border-radius: 14px;
@@ -159,6 +133,32 @@
         box-shadow:
             0 3px 0 var(--accent-dark),
             0 6px 14px #ff8a3d3d;
+    }
+
+    .choice-btn {
+        width: 100%;
+        font-size: 1.45rem;
+        font-weight: 900;
+        min-height: 58px;
+    }
+
+    .choice-btn:disabled {
+        cursor: default;
+        filter: none;
+    }
+
+    .choice-btn.wrong-choice {
+        background: linear-gradient(180deg, #ff7f95, #ef4a64);
+        box-shadow:
+            0 5px 0 #c43753,
+            0 10px 20px rgba(239, 74, 100, 0.28);
+    }
+
+    .choice-btn.correct-choice {
+        background: linear-gradient(180deg, #56d887, #2fbf5f);
+        box-shadow:
+            0 5px 0 #1f9852,
+            0 10px 20px rgba(47, 191, 95, 0.28);
     }
 
     #feedback {
@@ -259,18 +259,12 @@
         padding: 0.75rem;
     }
 
-    #input-area {
-        flex-direction: column;
-        gap: 0.5rem;
+    #choices-area {
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
     }
 
-    #answer {
-        width: 100%;
-        max-width: 220px;
-    }
-
-    button {
-        width: 100%;
-        max-width: 220px;
+    .choice-btn {
+        min-height: 52px;
     }
 }
