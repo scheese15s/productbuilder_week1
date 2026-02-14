@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 125" role="img" aria-label="A friendly robot with a round head, an antenna, two eyes, a smile, and a rectangular body with arms and legs.">
+  <style>
+    .robot-body { fill: #42a5f5; }
+    .robot-accent { fill: #ffca28; }
+    .robot-details { fill: #333; }
+    .robot-eye-shine { fill: #fff; }
+  </style>
+  <g>
+    <!-- Head -->
+    <rect class="robot-body" x="25" y="25" width="50" height="40" rx="20"/>
+
+    <!-- Antenna -->
+    <line class="robot-accent" x1="50" y1="25" x2="50" y2="15" stroke="#ffca28" stroke-width="2"/>
+    <circle class="robot-accent" cx="50" cy="12" r="4"/>
+
+    <!-- Eyes -->
+    <circle class="robot-details" cx="40" cy="45" r="5"/>
+    <circle class="robot-details" cx="60" cy="45" r="5"/>
+    <circle class="robot-eye-shine" cx="42" cy="43" r="1.5"/>
+    <circle class="robot-eye-shine" cx="62" cy="43" r="1.5"/>
+
+    <!-- Smile -->
+    <path class="robot-details" d="M40 55 q 10 7 20 0" stroke="#333" fill="none" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Body -->
+    <rect class="robot-body" x="20" y="65" width="60" height="35" rx="10"/>
+
+    <!-- Arms -->
+    <rect class="robot-body" x="10" y="70" width="8" height="25" rx="4"/>
+    <rect class="robot-body" x="82" y="70" width="8" height="25" rx="4"/>
+
+    <!-- Legs -->
+    <rect class="robot-body" x="35" y="100" width="10" height="15" rx="5"/>
+    <rect class="robot-body" x="55" y="100" width="10" height="15" rx="5"/>
+  </g>
+</svg>
