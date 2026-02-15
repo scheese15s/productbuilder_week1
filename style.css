@@ -151,6 +151,20 @@
         display: grid;
         gap: 0.55rem;
     }
+
+    #comments-section {
+        width: min(640px, 100%);
+        margin: 1rem auto 0;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 18px;
+        box-shadow: 0 10px 22px rgba(27, 53, 93, 0.12);
+    }
+
+    #disqus_thread {
+        margin-top: 0.65rem;
+    }
 }
 
 @layer components {
@@ -166,6 +180,12 @@
     }
 
     #contact-section h2 {
+        font-family: var(--display-font);
+        color: var(--title-sub);
+        font-size: clamp(1.3rem, 4vw, 1.7rem);
+    }
+
+    #comments-section h2 {
         font-family: var(--display-font);
         color: var(--title-sub);
         font-size: clamp(1.3rem, 4vw, 1.7rem);
