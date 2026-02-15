@@ -13,13 +13,7 @@ class NumberBlock extends HTMLElement {
         wrapper.style.flexDirection = 'column-reverse';
 
         const rainbowColors = [
-            '#ff6f61',
-            '#ffa726',
-            '#ffca28',
-            '#66bb6a',
-            '#42a5f5',
-            '#3f51b5',
-            '#ab47bc'
+            '#ff6f61', '#ffa726', '#ffca28', '#66bb6a', '#42a5f5', '#3f51b5', '#ab47bc'
         ];
 
         for (let i = 0; i < value; i++) {
@@ -59,12 +53,60 @@ class NumberBlock extends HTMLElement {
 
 customElements.define('number-block', NumberBlock);
 
+const operations = [
+    {
+        id: 'add-no-carry',
+        label: '덧셈 (올림 없음)',
+        symbol: '+',
+        min: 2,
+        max: 9,
+        randomPair: () => {
+            const num1 = Math.floor(Math.random() * 9) + 1;
+            const num2 = Math.floor(Math.random() * (9 - num1)) + 1;
+            return [num1, num2];
+        },
+        solve: (a, b) => a + b,
+        choiceSpan: 4
+    },
+    {
+        id: 'add-carry',
+        label: '덧셈 (올림 있음)',
+        symbol: '+',
+        min: 10,
+        max: 17,
+        randomPair: () => {
+            const num1 = Math.floor(Math.random() * 8) + 1;
+            const minNum2 = 10 - num1;
+            const num2 = Math.floor(Math.random() * (9 - minNum2 + 1)) + minNum2;
+            return [num1, num2];
+        },
+        solve: (a, b) => a + b,
+        choiceSpan: 4
+    },
+    {
+        id: 'multiply',
+        label: '곱셈',
+        symbol: '×',
+        min: 1,
+        max: 81,
+        randomPair: () => [Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9) + 1],
+        solve: (a, b) => a * b,
+        choiceSpan: 10
+    }
+];
+
+const operationMap = Object.fromEntries(operations.map((op) => [op.id, op]));
+
 const num1Container = document.getElementById('num1-container');
 const num2Container = document.getElementById('num2-container');
+const operatorSymbol = document.getElementById('operator-symbol');
 const choicesArea = document.getElementById('choices-area');
 const feedbackEl = document.getElementById('feedback');
 const hogiPopup = document.getElementById('hogi-popup');
+const modeMenuToggle = document.getElementById('mode-menu-toggle');
+const modeMenuList = document.getElementById('mode-menu-list');
 
+let currentMode = operations[0].id;
 let correctAnswer;
 
 const colorMap = {
@@ -79,6 +121,10 @@ const colorMap = {
     9: '#9e9e9e',
     10: 'white-red-border'
 };
+
+function getCurrentOperation() {
+    return operationMap[currentMode] || operations[0];
+}
 
 function getColorForNumber(number) {
     return colorMap[number] || '#333';
@@ -99,12 +145,25 @@ function shuffle(array) {
 }
 
 function buildChoices(answer) {
+    const operation = getCurrentOperation();
     const choices = new Set([answer]);
+    let attempts = 0;
 
-    while (choices.size < 4) {
-        const offset = Math.floor(Math.random() * 9) - 4;
+    while (choices.size < 4 && attempts < 120) {
+        attempts += 1;
+        const offset = Math.floor(Math.random() * (operation.choiceSpan * 2 + 1)) - operation.choiceSpan;
+        if (offset === 0) {
+            continue;
+        }
+
         const candidate = answer + offset;
-        if (candidate >= 2 && candidate <= 20) {
+        if (candidate >= operation.min && candidate <= operation.max) {
+            choices.add(candidate);
+        }
+    }
+
+    for (let candidate = operation.min; choices.size < 4 && candidate <= operation.max; candidate++) {
+        if (candidate !== answer) {
             choices.add(candidate);
         }
     }
@@ -120,9 +179,10 @@ function renderChoices() {
 }
 
 function generateProblem() {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    correctAnswer = num1 + num2;
+    const operation = getCurrentOperation();
+    const [num1, num2] = operation.randomPair();
+    correctAnswer = operation.solve(num1, num2);
+    operatorSymbol.textContent = operation.symbol;
 
     const color1 = getColorForNumber(num1);
     const color2 = getColorForNumber(num2);
@@ -184,6 +244,67 @@ function checkAnswer(selectedValue, buttonEl) {
     buttonEl.disabled = true;
 }
 
+function closeModeMenu() {
+    modeMenuList.classList.add('hidden');
+    modeMenuToggle.setAttribute('aria-expanded', 'false');
+}
+
+function openModeMenu() {
+    modeMenuList.classList.remove('hidden');
+    modeMenuToggle.setAttribute('aria-expanded', 'true');
+}
+
+function updateModeButtonLabel() {
+    const operation = getCurrentOperation();
+    modeMenuToggle.textContent = `문제: ${operation.label}`;
+}
+
+function renderModeMenu() {
+    modeMenuList.innerHTML = operations
+        .map((operation) => {
+            const selected = operation.id === currentMode;
+            return `<li class="mode-item ${selected ? 'selected' : ''}" role="option" data-mode="${operation.id}" aria-selected="${selected}">${operation.label}</li>`;
+        })
+        .join('');
+}
+
+function setMode(modeId) {
+    if (!operationMap[modeId]) {
+        return;
+    }
+
+    currentMode = modeId;
+    updateModeButtonLabel();
+    renderModeMenu();
+    generateProblem();
+}
+
+modeMenuToggle.addEventListener('click', () => {
+    const isOpen = !modeMenuList.classList.contains('hidden');
+    if (isOpen) {
+        closeModeMenu();
+    } else {
+        openModeMenu();
+    }
+});
+
+modeMenuList.addEventListener('click', (event) => {
+    const item = event.target.closest('.mode-item');
+    if (!item) {
+        return;
+    }
+
+    const modeId = item.dataset.mode || '';
+    closeModeMenu();
+    setMode(modeId);
+});
+
+document.addEventListener('click', (event) => {
+    if (!event.target.closest('#mode-picker')) {
+        closeModeMenu();
+    }
+});
+
 choicesArea.addEventListener('click', (event) => {
     const button = event.target.closest('.choice-btn');
     if (!button) {
@@ -198,4 +319,6 @@ choicesArea.addEventListener('click', (event) => {
     checkAnswer(selectedValue, button);
 });
 
+updateModeButtonLabel();
+renderModeMenu();
 generateProblem();

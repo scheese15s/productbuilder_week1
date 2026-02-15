@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO Meta Tags -->
-    <title>신나는 덧셈 놀이! | 아이들을 위한 재미있는 숫자 공부</title>
-    <meta name="description" content="아이들이 좋아하는 숫자 블록과 함께 즐겁게 덧셈을 배워요! 정답을 맞추면 신나는 축하가! 놀면서 배우는 유아, 초등학생용 산수 게임.">
-    <meta name="keywords" content="덧셈, 덧셈 공부, 산수, 숫자 놀이, 숫자 공부, 유아 수학, 초등 수학, 교육용 게임, 어린이 게임, 셈하기">
+    <title>신나는 수학 놀이! | 덧셈과 곱셈 4지선다 게임</title>
+    <meta name="description" content="아이들이 좋아하는 숫자 블록과 함께 덧셈, 곱셈을 즐겁게 배워요! 정답을 맞추면 신나는 축하가! 놀면서 배우는 유아, 초등학생용 산수 게임.">
+    <meta name="keywords" content="덧셈, 곱셈, 산수, 숫자 놀이, 숫자 공부, 유아 수학, 초등 수학, 교육용 게임, 어린이 게임, 셈하기">
 
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <link rel="stylesheet" href="style.css?v=5.0">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,10 +18,18 @@
 </head>
 <body>
     <div id="game-container">
-        <h1>신나는 덧셈 놀이!</h1>
+        <h1>신나는 수학 놀이!</h1>
+
+        <div id="mode-picker" aria-label="문제 유형 선택">
+            <button id="mode-menu-toggle" type="button" aria-haspopup="listbox" aria-expanded="false">
+                문제: 덧셈
+            </button>
+            <ul id="mode-menu-list" class="hidden" role="listbox" aria-label="문제 유형 목록"></ul>
+        </div>
+
         <div id="problem">
             <div id="num1-container"></div>
-            <span class="operator">+</span>
+            <span class="operator" id="operator-symbol">+</span>
             <div id="num2-container"></div>
             <span class="operator">=</span>
             <span class="answer-box">?</span>
@@ -34,8 +42,10 @@
     <!-- Hogi Popup -->
     <div id="hogi-popup" class="hidden">
         <img src="hogi.jpg" alt="귀여운 캐릭터 호기">
+
+
     </div>
 
-    <script src="main.js?v=4.0"></script>
+    <script src="main.js?v=5.0"></script>
 </body>
 </html>
