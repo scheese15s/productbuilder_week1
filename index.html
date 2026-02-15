@@ -39,6 +39,20 @@
         <div id="feedback"></div>
     </div>
 
+    <section id="contact-section" aria-label="문의하기">
+        <h2>문의하기</h2>
+        <form id="contact-form" action="https://formspree.io/f/xkovrkey" method="POST">
+            <label for="contact-email">이메일</label>
+            <input id="contact-email" name="email" type="email" placeholder="you@example.com" required>
+
+            <label for="contact-message">메시지</label>
+            <textarea id="contact-message" name="message" rows="4" placeholder="문의 내용을 적어주세요." required></textarea>
+
+            <input type="hidden" name="_subject" value="신나는 수학 놀이 문의">
+            <button type="submit">보내기</button>
+        </form>
+    </section>
+
     <!-- Hogi Popup -->
     <div id="hogi-popup" class="hidden">
         <img src="hogi.jpg" alt="귀여운 캐릭터 호기">
